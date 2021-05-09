@@ -21,17 +21,23 @@
 
                     <form name="myForm">
                         <div class="form-group">
-                            <label for="Token">Api</label>
+                            <label for="api">Elige una opción</label>
                             <select name='api' class="form-control">
-                                <option value="1">Proceso inicial</option>
+                                <option value="0">Transformar Token</option>
+                                <option  selected value="1">Proceso inicial</option>
                                 <option value="2">misLineas</option>
                                 <option value="3">misLineasV2</option>
                                 <option value="4">misDatos</option>
                                 <option value="5">todosMisConsumos</option>
                                 <option value="6">generarTodos</option>
+                                <option value="7">Otra</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div  id="apiUser" class="form-group"  >
+                            <label for="apiUser">Api</label>
+                            <input type="text" class="form-control" placeholder="Api" name="apiUser" id="apiUser">
+                        </div>
+                        <div id="Token" class="form-group"  >
                             <label for="Token">Token</label>
                             <input type="text" class="form-control" placeholder="Token" name="token" id="token">
                         </div>
@@ -51,19 +57,21 @@
                                        id="CodTari">
                             </div>
                         </div>
-                        <div class="form-group mt-2">
+                        <div id="cookieGroup" class="form-group mt-2">
                             <label for="Cookie">Cookie</label>
                             <input type="text" class="form-control" placeholder="Cookie" name="Cookie" id="Cookie">
                         </div>
-                        <div class="form-group">
-                            <label for="id">Id</label> <small>(Se generará aleatoriamente en el caso de que esté
+                        <div class="form-group" id="idGroup">
+                            <label  for="id">Id</label> <small>(Se generará aleatoriamente en el caso de que esté
                             vacío)</small>
                             <input type="text" class="form-control" placeholder="Identificador" name="id" id="id">
                         </div>
-                        <input type="button" class="btn btn-primary" value="Generar Curl" name="curl"/>
-                        <input type="button" class="btn btn-danger" value="Reset" onclick="reset()"/>
-                        <input type="button" class="btn btn-danger" value="Limpiar historial" onclick="clean()"/>
-
+                        <br>
+                        <div id="buttons">
+                            <input type="button"  class="btn btn-primary" value="Generar Curl" name="curl"/>
+                            <input type="button" class="btn btn-danger" value="Reset" onclick="reset()"/>
+                            <input type="button" class="btn btn-danger" value="Limpiar historial" onclick="clean()"/>
+                        </div>  
                         <input type="hidden" value="ff" id="clipboard">
                         <div class="d-flex flex-column-reverse mt-5" id="resultado"></div>
 
@@ -106,6 +114,20 @@
         } else {
             document.getElementById('complementos').style.display = "none";
         }
+        if (document.myForm.api.value == 0 ) {
+            document.getElementById('buttons').classList.add("mt-4");
+            document.getElementById('cookieGroup').style.display = "none";
+            document.getElementById('idGroup').style.display = "none";
+        }else{
+            document.getElementById('buttons').classList.remove("mt-4");
+            document.getElementById('cookieGroup').style.display = "block";
+            document.getElementById('idGroup').style.display = "block";
+        }
+        if (document.myForm.api.value == 7 ) {
+            document.getElementById('apiUser').style.display = "block";
+        }else{
+            document.getElementById('apiUser').style.display = "none";
+        }
     }
 
     function main() {
@@ -115,6 +137,12 @@
     function validar(value, input) {
         valido = true;
         switch (input) {
+            case 0: //token
+                if (value == '' || value == null) {
+                    alert('Debes de especificar un token');
+                    valido = false;
+                }
+                break;
             case 1: //token
                 if (value == '' || value == null) {
                     alert('Debes de especificar un token');
@@ -128,7 +156,7 @@
                 }
                 break;
             case 3: //api
-                if (value == 0 || value == null) {
+                if (value < 0 || value == null) {
                     alert('Debes de especificar una api');
                     valido = false;
                 }
@@ -154,6 +182,12 @@
             case 7: //CodFac
                 if (value.replace(/\s+/g, '').length < 3 || value == null) {
                     alert('Debes de especificar una codFac');
+                    valido = false;
+                }
+                break;
+            case 8: //CodFac
+                if (value == '' || value == null) {
+                    alert('Debes de especificar una api');
                     valido = false;
                 }
                 break;
@@ -183,6 +217,9 @@
             token2 = replace2(token2, '\u0026');
 
             switch (api) {
+                case '0':
+                    transformarToken();
+                    break;
                 case '1':
                     procesoInicial();
                     break;
@@ -208,8 +245,6 @@
                     if (validar(movil, 5) && validar(CodTari, 6) && validar(CodFac, 7)) {
                         todosMisConsumos();
                     }
-
-
                     break;
                 case '6':
                     procesoInicial();
@@ -218,10 +253,22 @@
                     misDatos();
                     todosMisConsumos();
                     break;
+                case '7':
+                api = document.myForm.apiUser.value;
+                if (validar(api, 8)) {
+                    otra();
+                }
+                    break;
             }
             mostrarEnElHistorial(resultado);
 
         }
+
+    }
+    function transformarToken() {
+        copyToClipboard(token2);
+        resultado.push({'curl': token2, 'titulo': 'Token', 'hora': new Date()});
+
 
     }
 
@@ -260,6 +307,12 @@
           curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie  \'' + cookie +  '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FtodosMisConsumos/linea/' + movil + '/' + codFactu + '/' + codTari + '%3FuniqueUID%3D' + id;
         copyToClipboard(curl);
         resultado.push({'curl': curl, 'titulo': 'Todos Mis Consumos', 'hora': new Date()});
+
+    }
+    function otra() {
+          curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2F'+api+'%3FuniqueUID%3D' + id + '';
+        copyToClipboard(curl);
+        resultado.push({'curl': curl, 'titulo': api, 'hora': new Date()});
 
     }
 
