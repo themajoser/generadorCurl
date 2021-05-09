@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeneradorDeCurl's</title>
+    <link rel="stylesheet" href="bootstrap-4.5.2-dist/css/bootstrap.min.css">
+
+</head>
+<body id="body" class="bg-info">
+<div class="container ">
+    <div class="row  ">
+        <div class="col-lg">
+            <div class="card">
+                <div class=" text-center">
+                    <h1 class="card-title">GENERADOR DE CURL's</h1>
+                    <h4>Te genero la curl y te la copio a tu portapapeles.</h4>
+                </div>
+
+                <div class="card-body ">
+
+
+                    <form name="myForm">
+                        <div class="form-group">
+                            <label for="Token">Api</label>
+                            <select name='api' class="form-control">
+                                <option value="1">Proceso inicial</option>
+                                <option value="2">misLineas</option>
+                                <option value="3">misLineasV2</option>
+                                <option value="4">misDatos</option>
+                                <option value="5">todosMisConsumos</option>
+                                <option value="6">generarTodos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="Token">Token</label>
+                            <input type="text" class="form-control" placeholder="Token" name="token" id="token">
+                        </div>
+                        <small>Ejemplo: Appid\u003dASM\u0026mcts\u003d1598597492127\u0026ositeid\u003d0071...</small>
+                        <div id="complementos" style="display: none;">
+                            <div class="form-group mt-2">
+                                <label for="movil">Móvil</label>
+                                <input type="text" class="form-control" placeholder="Móvil" name="movil" id="movil">
+                            </div>
+                            <div class="form-group">
+                                <label for="CodFac">CodFac</label>
+                                <input type="text" class="form-control" placeholder="CodFac" name="CodFac" id="CodFac">
+                            </div>
+                            <div class="form-group">
+                                <label for="CodTari">CodTari</label>
+                                <input type="text" class="form-control" placeholder="CodTari" name="CodTari"
+                                       id="CodTari">
+                            </div>
+                        </div>
+                        <div class="form-group mt-2">
+                            <label for="Cookie">Cookie</label>
+                            <input type="text" class="form-control" placeholder="Cookie" name="Cookie" id="Cookie">
+                        </div>
+                        <div class="form-group">
+                            <label for="id">Id</label> <small>(Se generará aleatoriamente en el caso de que esté
+                            vacío)</small>
+                            <input type="text" class="form-control" placeholder="Identificador" name="id" id="id">
+                        </div>
+                        <input type="button" class="btn btn-primary" value="Generar Curl" name="curl"/>
+                        <input type="button" class="btn btn-danger" value="Reset" onclick="reset()"/>
+                        <input type="button" class="btn btn-danger" value="Limpiar historial" onclick="clean()"/>
+
+                        <input type="hidden" value="ff" id="clipboard">
+                        <div class="d-flex flex-column-reverse mt-5" id="resultado"></div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="page-footer font-small  ">
+    <!-- Footer Elements -->
+    <div class="col-md-12 py-5">
+    </div>
+
+    <!-- Footer Elements -->
+
+    <!-- Copyright -->
+    <div class="footer-copyright text-center   ">
+        © 2020 Copyright:
+        <a href="#"> JORGE ORENES RUBIO</a>
+    </div>
+    <!-- Copyright -->
+</footer>
+
+
+<script>
+    resultado = [];
+    token = '';
+    id = '';
+
+    function asociar() {
+        document.myForm.curl.addEventListener('click', main);
+        document.myForm.api.addEventListener('click', activeInputs);
+
+    }
+
+    function activeInputs() {
+        if (document.myForm.api.value == 6 || document.myForm.api.value == 5) {
+            document.getElementById('complementos').style.display = "block";
+        } else {
+            document.getElementById('complementos').style.display = "none";
+        }
+    }
+
+    function main() {
+        doCurl();
+    }
+
+    function validar(value, input) {
+        valido = true;
+        switch (input) {
+            case 1: //token
+                if (value == '' || value == null) {
+                    alert('Debes de especificar un token');
+                    valido = false;
+                }
+                break;
+            case 2: //cookie
+                if (value == '' || value == null) {
+                    alert('Debes de especificar una cookie');
+                    valido = false;
+                }
+                break;
+            case 3: //api
+                if (value == 0 || value == null) {
+                    alert('Debes de especificar una api');
+                    valido = false;
+                }
+                break;
+            case 4: //id
+                if (value == '' || value == null) {
+                    id = 'PRUEBA' + Math.round(Math.random() * 682);
+                }
+                break;
+            case 5: //móvil
+                if (value.replace(/\s+/g, '').length < 9 || value == null) {
+                    alert('Debes de especificar un móvil válido');
+                    valido = false;
+                }
+                break;
+            case 6: //CodTari
+                console.log(value);
+                if (value.replace(/\s+/g, '').length < 3 || value == null) {
+                    alert('Debes de especificar una codTari');
+                    valido = false;
+                }
+                break;
+            case 7: //CodFac
+                if (value.replace(/\s+/g, '').length < 3 || value == null) {
+                    alert('Debes de especificar una codFac');
+                    valido = false;
+                }
+                break;
+
+        }
+        return valido;
+    }
+
+
+    function doCurl() {
+        curl = '';
+        cookie = '';
+        api = document.myForm.api.value;
+        token = document.getElementById('token').value;
+        id = document.getElementById('id').value;
+        tamanio = resultado.length;
+
+        check = validar(api, 3) * //Valida que se haya seleccionado la api
+            validar(token, 1) *  //Valida el token
+            validar(id, 4); //Comprueba el id por si tienes que generarlo
+       
+
+        if (check == true) {
+
+            cookie = document.getElementById('Cookie').value;
+            token2 = replace2(token, '\u003d');
+            token2 = replace2(token2, '\u0026');
+
+            switch (api) {
+                case '1':
+                    procesoInicial();
+                    break;
+                case '2':
+                    if (validar(cookie, 2)) {
+                        misLineas();
+                    }
+                    break;
+                case '3':
+                    if (validar(cookie, 2)) {
+                        misLineasV2();
+                    }
+                    break;
+                case '4':
+                    if (validar(cookie, 2)) {
+                        misDatos();
+                    }
+                    break;
+                case '5':
+                    movil = document.getElementById('movil').value;
+                    CodTari = document.getElementById('CodTari').value;
+                    CodFac = document.getElementById('CodFac').value;
+                    if (validar(movil, 5) && validar(CodTari, 6) && validar(CodFac, 7)) {
+                        todosMisConsumos();
+                    }
+
+
+                    break;
+                case '6':
+                    procesoInicial();
+                    misLineas();
+                    misLineasV2();
+                    misDatos();
+                    todosMisConsumos();
+                    break;
+            }
+            mostrarEnElHistorial(resultado);
+
+        }
+
+    }
+
+    function procesoInicial() {
+        curl = ' curl -v -H "X-XSRF-TOKEN:' + token2 + '" -X GET http://bointeg.srv.osi:31020/cclimuleto/OperCon/service/privado/api/procesoInicial?uniqueUID=' + id + '';
+        copyToClipboard(curl);
+        resultado.push({'curl': curl, 'titulo': 'Proceso inicial', 'hora': new Date()});
+
+
+    }
+
+    function misLineas() {
+        curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisLineas%3FuniqueUID%3D' + id + '';
+        copyToClipboard(curl);
+        resultado.push({'curl': curl, 'titulo': 'Mis Lineas', 'hora': new Date()});
+    }
+
+    function misLineasV2() {
+          curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisLineasV2%3FuniqueUID%3D' + id + '';
+        copyToClipboard(curl);
+        resultado.push({'curl': curl, 'titulo': 'Mis LineasV2', 'hora': new Date()});
+
+    }
+
+    function misDatos() {
+          curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisDatos%3FuniqueUID%3D' + id + '';
+        copyToClipboard(curl);
+        resultado.push({'curl': curl, 'titulo': 'Mis Datos', 'hora': new Date()});
+
+    }
+
+    function todosMisConsumos() {
+        movil = document.getElementById('movil').value;
+        codFactu = document.getElementById('CodFac').value;
+        codTari = document.getElementById('CodTari').value;
+          curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie  \'' + cookie +  '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FtodosMisConsumos/linea/' + movil + '/' + codFactu + '/' + codTari + '%3FuniqueUID%3D' + id;
+        copyToClipboard(curl);
+        resultado.push({'curl': curl, 'titulo': 'Todos Mis Consumos', 'hora': new Date()});
+
+    }
+
+
+    function replace2(datos, regex) {
+        var result = '';
+        if (regex === '\u003d') { //=
+            chars = datos.split(/\\u003d/g);
+            result = chars.join('=')
+
+        } else if (regex === '\u0026') { //&
+            chars = datos.split(/\\u0026/g);
+            result = chars.join('&')
+        }
+        return result;
+    }
+
+    function copyToClipboard(texto) {
+        const el = document.createElement("textarea");
+        el.value = 'texto';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        navigator.clipboard.writeText(texto);
+        el.value = '';
+        el.hidden = true;
+    }
+
+    function clean() {
+        document.getElementById('resultado').innerText = '';
+        resultado = [];
+    }
+
+    function mostrarEnElHistorial(texto) {
+        document.getElementById('resultado').innerText = '';
+        texto.forEach(function (elemento) {
+
+            document.getElementById('resultado').innerHTML += elemento['curl'];
+            document.getElementById('resultado').innerHTML += "<h1>" + elemento['titulo'] + "</h1>" +
+                " <small class='text-right'>" + elemento['hora'].getHours() + ":" + elemento['hora'].getMinutes() + "</small>";
+        });
+
+
+    }
+
+
+    document.addEventListener("DOMContentLoaded", asociar);
+
+</script>
+<script src="jquery-3.5.1.slim.min.js"></script>
+<script src="popper.min.js"></script>
+<script src="bootstrap-4.5.2-dist/js/bootstrap.min.js"></script>
+</body>
+</html>
