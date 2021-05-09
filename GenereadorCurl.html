@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GeneradorDeCurl's</title>
+    <title>GeneradorDeCurl's v1.2</title>
     <link rel="stylesheet" href="bootstrap-4.5.2-dist/css/bootstrap.min.css">
 
 </head>
 <body id="body" class="bg-info">
 <div class="container ">
     <div class="row  ">
-        <div class="col-lg">
+        <div class="col-lg-12">
             <div class="card">
                 <div class=" text-center">
-                    <h1 class="card-title">GENERADOR DE CURL's</h1>
+                    <h1 class="card-title">GENERADOR DE CURL's v1.2</h1>
                     <h4>Te genero la curl y te la copio a tu portapapeles.</h4>
                 </div>
 
@@ -33,7 +33,7 @@
                                 <option value="7">Otra</option>
                             </select>
                         </div>
-                        <div  id="apiUser" class="form-group"  >
+                        <div  id="apiUser" style="display: none;" class="form-group"  >
                             <label for="apiUser">Api</label>
                             <input type="text" class="form-control" placeholder="Api" name="apiUser" id="apiUser">
                         </div>
@@ -65,6 +65,20 @@
                             <label  for="id">Id</label> <small>(Se generará aleatoriamente en el caso de que esté
                             vacío)</small>
                             <input type="text" class="form-control" placeholder="Identificador" name="id" id="id">
+                        </div>
+                        <div class="form-group" >
+                        <a href="#" id="more">Ajustes avanzados</a>
+                        </div>
+                        <div id="avanzados" style="display: none;">
+                            <div class="form-group">
+                                <label for="entorno">Elige un entorno</label>
+                                <select name='entorno' class="form-control">
+                                    <option  selected value="1">Integración</option>
+                                    <option value="2">Certificación</option>
+                                    <option value="3">Muleto</option>
+                                    <option value="4">Produccion</option>
+                                </select>
+                            </div>
                         </div>
                         <br>
                         <div id="buttons">
@@ -218,24 +232,32 @@
 
             switch (api) {
                 case '0':
-                    transformarToken();
+                    copyToClipboard(token2);
+                    resultado.push({'curl': token2, 'titulo': 'Token', 'hora': new Date()});
                     break;
                 case '1':
-                    procesoInicial();
+                    copyToClipboard(curl);
+                    resultado.push({'curl': curl, 'titulo': 'Proceso inicial', 'hora': new Date()});
                     break;
                 case '2':
                     if (validar(cookie, 2)) {
                         misLineas();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': 'Mis Lineas', 'hora': new Date()});
                     }
                     break;
                 case '3':
                     if (validar(cookie, 2)) {
                         misLineasV2();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': 'Mis LineasV2', 'hora': new Date()});
                     }
                     break;
                 case '4':
                     if (validar(cookie, 2)) {
                         misDatos();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': 'Mis Datos', 'hora': new Date()});
                     }
                     break;
                 case '5':
@@ -244,7 +266,10 @@
                     CodFac = document.getElementById('CodFac').value;
                     if (validar(movil, 5) && validar(CodTari, 6) && validar(CodFac, 7)) {
                         todosMisConsumos();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': 'Todos Mis Consumos', 'hora': new Date()});
                     }
+                   
                     break;
                 case '6':
                     procesoInicial();
@@ -257,6 +282,8 @@
                 api = document.myForm.apiUser.value;
                 if (validar(api, 8)) {
                     otra();
+                    copyToClipboard(curl);
+                    resultado.push({'curl': curl, 'titulo': api, 'hora': new Date()});
                 }
                     break;
             }
@@ -265,38 +292,23 @@
         }
 
     }
-    function transformarToken() {
-        copyToClipboard(token2);
-        resultado.push({'curl': token2, 'titulo': 'Token', 'hora': new Date()});
-
-
-    }
 
     function procesoInicial() {
         curl = ' curl -v -H "X-XSRF-TOKEN:' + token2 + '" -X GET http://bointeg.srv.osi:31020/cclimuleto/OperCon/service/privado/api/procesoInicial?uniqueUID=' + id + '';
-        copyToClipboard(curl);
-        resultado.push({'curl': curl, 'titulo': 'Proceso inicial', 'hora': new Date()});
-
-
     }
 
     function misLineas() {
-        curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisLineas%3FuniqueUID%3D' + id + '';
-        copyToClipboard(curl);
-        resultado.push({'curl': curl, 'titulo': 'Mis Lineas', 'hora': new Date()});
+         curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisLineas%3FuniqueUID%3D' + id + '';
     }
 
     function misLineasV2() {
           curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisLineasV2%3FuniqueUID%3D' + id + '';
-        copyToClipboard(curl);
-        resultado.push({'curl': curl, 'titulo': 'Mis LineasV2', 'hora': new Date()});
+       
 
     }
 
     function misDatos() {
-          curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisDatos%3FuniqueUID%3D' + id + '';
-        copyToClipboard(curl);
-        resultado.push({'curl': curl, 'titulo': 'Mis Datos', 'hora': new Date()});
+          curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FmisDatos%3FuniqueUID%3D' + id + ''; 
 
     }
 
@@ -305,14 +317,10 @@
         codFactu = document.getElementById('CodFac').value;
         codTari = document.getElementById('CodTari').value;
           curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie  \'' + cookie +  '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2FtodosMisConsumos/linea/' + movil + '/' + codFactu + '/' + codTari + '%3FuniqueUID%3D' + id;
-        copyToClipboard(curl);
-        resultado.push({'curl': curl, 'titulo': 'Todos Mis Consumos', 'hora': new Date()});
 
     }
     function otra() {
           curl = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\' -X GET http://bointeg.srv.osi:31020/cclimuleto/OperGenerica?service=api%2F'+api+'%3FuniqueUID%3D' + id + '';
-        copyToClipboard(curl);
-        resultado.push({'curl': curl, 'titulo': api, 'hora': new Date()});
 
     }
 
