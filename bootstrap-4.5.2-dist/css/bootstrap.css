@@ -10178,6 +10178,10 @@ a.text-dark:hover, a.text-dark:focus {
   visibility: hidden !important;
 }
 
+.text-gray-600 {
+  color: #7e8299!important;
+}
+
 @media print {
   *,
   *::before,

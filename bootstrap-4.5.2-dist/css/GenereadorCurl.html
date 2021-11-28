@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeneradorDeCurl's v1.2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="bootstrap-4.5.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="body" style="background-color: #8d837480;">
+    
+<div class="container ">
+    <div class="row  ">
+        <div class="col-lg-12">
+            <div class="card card-stretch">
+                <div class=" text-center">
+                    <h1 style="color:#4d5760;" class="card-title">GENERADOR DE CURL's v1.2</h1>
+                    <h4 style="color:#4d5760;">Te genero la curl y te la copio a tu portapapeles.</h4>
+                </div>
+
+                <div class="card-body ">
+
+
+                    <form name="myForm">
+                        <div class="form-group">
+                            <label class="form-check-label fw-bold text-gray-600" for="api">Elige una opción</label>
+                            <select name='api' class="form-control jorForm">
+                                <option value="0">Transformar Token</option>
+                                <option  selected value="1">Proceso inicial</option>
+                                <option value="2">misLineas</option>
+                                <option value="3">misLineasV2</option>
+                                <option value="4">misDatos</option>
+                                <option value="5">todosMisConsumos</option>
+                                <option value="7">Otra</option>
+                            </select>
+                        </div>
+                        <div  id="apiUser" style="display: none;" class="form-group"  >
+                            <label class="form-check-label fw-bold text-gray-600" for="apiUser">Api</label>
+                            <input type="text" class="form-control jorForm" placeholder="Api" name="apiUser" id="apiUser">
+                        </div>
+                        <div id="Token" class="form-group"  >
+                            <label class="form-check-label fw-bold text-gray-600" for="Token">Token</label>
+                            <input type="text" class="form-control jorForm" placeholder="Token" name="token" id="token">
+                        </div>
+                        <small class="text-muted mt-2 fw-bold fs-6">Ejemplo: Appid\u003dASM\u0026mcts\u003d1598597492127\u0026ositeid\u003d0071...</small>
+                        <div  id="cookieGroup" class="form-group mt-2">
+                            <label class="form-check-label fw-bold text-gray-600" for="Cookie">Cookie</label>
+                            <input type="text" class="form-control jorForm" placeholder="Cookie" name="Cookie" id="Cookie">
+                        </div>
+                        <div class="form-group" id="idGroup">
+                            <label class="form-check-label fw-bold text-gray-600" for="id">Id</label> <small>(Se generará aleatoriamente en el caso de que esté
+                            vacío)</small>
+                            <input type="text" class="form-control jorForm" placeholder="Identificador" name="id" id="id">
+                        </div>
+                        <div  name="more" id="more" class="form-group" >
+                        <a  >Ajustes avanzados</a   >
+                        </div>
+                        <div id="avanzados" style="display: none;">
+                            <div class="row  ">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="entorno">Entorno</label>
+                                        <select name='entorno' class="form-control">
+                                            <option  selected value="integracion">Integración</option>
+                                            <option value="certificacion">Certificación</option>
+                                            <option value="cclimuleto">Muleto</option>
+                                            <option value="ccli">Produccion</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="destino">Destino</label>
+                                        <select name='destino' class="form-control">
+                                            <option  selected value="API">API</option>
+                                            <option value="BUS">BUS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div id="buttons">
+                            <input   class="btn btn-info fw-bolder fs-6 " style="background-color:#687a78;border-color:#687a78;" value="Generar" name="curl"/>
+                            <input type="button" class="btn btn-danger" style="background-color: #afc4d1; border-color:#afc4d1;" value="Reset" onclick="reset()"/>
+                            <input type="button" class="btn btn-danger" style="background-color: #afc4d1; border-color:#afc4d1;" value="Limpiar historial" onclick="clean()"/>
+                        </div>  
+
+                    </form>
+                </div>
+            </div>
+           
+            <input type="hidden" value="ff" id="clipboard">
+            <div  id="resultado"></div>
+            <div  id="resultado"></div>
+           
+        </div>
+    </div>
+</div>
+<footer class="page-footer font-small  ">
+    <!-- Footer Elements -->
+    <div class="col-md-12 py-5">
+    </div>
+
+    <!-- Footer Elements -->
+
+    <!-- Copyright -->
+    <div class="footer-copyright text-center   ">
+        © 2020 Copyright:
+        <a href="#"> JORGE ORENES RUBIO</a>
+    </div>
+    <!-- Copyright -->
+</footer>
+
+
+<script>
+
+    entorno='cclimuleto';
+    resultado = [];
+    token = '';
+    id = '';
+
+    function asociar() {
+        document.myForm.curl.addEventListener('click', doCurl);
+        document.myForm.api.addEventListener('change', activeInputs);
+        document.getElementById('more').addEventListener('click', mostrarMas);
+    }
+
+    function activeInputs() {
+
+        if (document.myForm.api.value == 0 ) {
+            document.getElementById('buttons').classList.add("mt-4");
+            document.getElementById('cookieGroup').style.display = "none";
+            document.getElementById('idGroup').style.display = "none";
+        }else{
+            document.getElementById('buttons').classList.remove("mt-4");
+            document.getElementById('cookieGroup').style.display = "block";
+            document.getElementById('idGroup').style.display = "block";
+        }
+        if (document.myForm.api.value == 7 ) {
+            if (document.getElementById('apiUser').style.display = "none" ) {
+            document.getElementById('apiUser').style.display = "block";
+            }else{
+            document.getElementById('apiUser').style.display = "none";
+            }
+        }
+    }
+    function mostrarMas() {
+        if(document.getElementById('avanzados').style.display != "block"){
+            document.getElementById('avanzados').style.display = "block";
+        }else{
+            document.getElementById('avanzados').style.display = "none";
+        }
+        
+        
+    }
+
+  
+        
+        function copyCurl(event){
+                objeto=event.target.attributes.onclick.ownerElement.innerHTML;
+               // console.log(objeto);
+                navigator.clipboard.writeText(objeto);
+           
+        }
+      
+        
+
+    
+
+
+   
+
+
+    function doCurl() {
+        
+        cookie = '';
+        api = document.myForm.api.value;
+        token = document.getElementById('token').value;
+        id = document.getElementById('id').value;
+        apiUser = document.myForm.apiUser.value;
+        tamanio = resultado.length;
+        check = validar(api, 3) * //Valida que se haya seleccionado la api
+            validar(token, 1) *  //Valida el token
+            validar(id, 4); //Comprueba el id por si tienes que generarlo
+       
+
+        if (check == true) {
+
+            cookie = document.getElementById('Cookie').value;
+            token2 = replace2(token, '\u003d');
+            token2 = replace2(token2, '\u0026');
+
+            switch (api) {
+                case '0':
+                    copyToClipboard(token2);
+                    resultado.push({'curl': token2, 'titulo': 'Token', 'hora': new Date()});
+                    break;
+                case '1':
+                    procesoInicial();
+                    copyToClipboard(curl);
+                    resultado.push({'curl': curl, 'titulo': 'Proceso inicial', 'hora': new Date()});
+                    break;
+                case '2':
+                    if (validar(cookie, 2)) {
+                        misLineas();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': 'Mis Lineas', 'hora': new Date()});
+                    }
+                    break;
+                case '3':
+                    if (validar(cookie, 2)) {
+                        misLineasV2();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': 'Mis LineasV2', 'hora': new Date()});
+                    }
+                    break;
+                case '4':
+                    if (validar(cookie, 2)) {
+                        misDatos();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': 'Mis Datos', 'hora': new Date()});
+                    }
+                    break;
+                case '7': //Otra
+                    if (apiUser == '' || apiUser == null) {
+                        alert('Debes de especificar una api');
+                        valido = false;
+                    }else{
+                       
+                        otra();
+                        copyToClipboard(curl);
+                        resultado.push({'curl': curl, 'titulo': apiUser, 'hora': new Date()});
+                    }
+                    break;
+                default:
+                    copyToClipboard(curl);
+                    resultado.push({'curl': curl, 'titulo': 'Mis Datos', 'hora': new Date()});
+            }
+            
+            mostrarEnElHistorial(resultado);
+
+        }
+
+    }
+
+    document.addEventListener("DOMContentLoaded", asociar);
+
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js">
+        $(document).ready(function(){
+        $(".fadein").fadeOut(500);
+      })
+</script>
+</script>
+<script src="jquery-3.5.1.slim.min.js">      
+</script>
+<script src="popper.min.js"></script>
+<script  type="text/javascript" src="apis.js"></script>
+<script  type="text/javascript" src="functions.js"></script>
+<script  type="text/javascript" src="functionsjQuery.js"></script>
+<script src="bootstrap-4.5.2-dist/js/bootstrap.min.js"></script>
+</body>
+</html>

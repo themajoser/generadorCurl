@@ -1,0 +1,28 @@
+body{
+    font-family: Poppins,Helvetica,"sans-serif";
+}
+.jorForm{
+    background-color: #6c757d1f;
+    border: 1px solid #6c757d1f;
+   
+    
+   
+}
+.fadein{
+
+    background-color: #687a78;
+    color:white;
+
+}
+.copiado{
+    display:none;
+    color:#efefef;
+}
+.sizeButton{
+    width: 45%;
+    margin-bottom: 2%;
+}
+.sizeButtonG{
+    width: 60%;
+    margin-bottom: 2%;
+}
