@@ -1,5 +1,5 @@
 function curlString( api){
-  
+    cookie=document.getElementById("Cookie").value==""?"":'" --cookie \''+document.getElementById("Cookie").value
     entorno=document.myForm.entorno.value;
     destino=document.myForm.destino.value;
     unix=new Date().getTime().toString();
@@ -34,7 +34,7 @@ function curlString( api){
                         break;
             }
         }else{
-            curl1 = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\'' + ' -X GET ';
+            curl1 = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + cookie + '\'' + ' -X GET ';
             api=api+parametros;
             switch(entorno){
                 case "integracion":
@@ -73,7 +73,7 @@ function curlString( api){
             }
         }else{
             api=api+parametros;
-            curl1 = ' curl -v -H  "X-XSRF-TOKEN:' + token2 + '" --cookie \'' + cookie + '\'' + ' -X GET ';
+            curl1 = ' curl -v -H  "X-XSRF-TOKEN:' + token2  + cookie + '\'' + ' -X GET ';
             switch(entorno){
                 case "integracion":
                     curl1+="http://tehol001.prod.inte:31020/CCLI_OR_PRJ/"+api+uid;
